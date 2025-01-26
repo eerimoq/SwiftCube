@@ -10,7 +10,6 @@ import Foundation
 public struct SC3DLut: CustomDebugStringConvertible, Codable {
     public var title: String? = nil
     public var type: LUTType! = nil
-    public var domain: LUTDomain = .init(min: [0, 0, 0], max: [1, 1, 1])
     public var size: Int! = nil
     public var data: [[Float]] = []
 
@@ -21,9 +20,7 @@ public struct SC3DLut: CustomDebugStringConvertible, Codable {
 
     /// Initialize a LUT from a Data object generated from the .rawDataRepresentation() method
     public init(dataRepresentation: Data) throws {
-        let decoder = BinaryDecoder()
-        let data = try decoder.decode(SC3DLut.self, from: dataRepresentation)
-        self = data
+        self = try BinaryDecoder().decode(SC3DLut.self, from: dataRepresentation)
     }
 
     /// Initialize a LUT from a .cube file's data
@@ -96,11 +93,6 @@ public struct SC3DLut: CustomDebugStringConvertible, Codable {
         let data = try encoder.encode(self)
         return data
     }
-}
-
-public struct LUTDomain: Codable {
-    let min: [Double]
-    let max: [Double]
 }
 
 public enum LUTType: Codable {
