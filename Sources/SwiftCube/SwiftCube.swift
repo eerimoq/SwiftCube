@@ -32,21 +32,21 @@ public struct SC3DLut: CustomDebugStringConvertible, Codable {
         guard !stringData.isEmpty else {
             throw SwiftCubeError.couldNotDecodeData
         }
-        let lines = stringData.components(separatedBy: "\n")
-        try lines.forEach { line in
-            guard !line.isEmpty && line.first != "#" else { return }
+        for line in stringData.components(separatedBy: "\n") {
+            guard !line.isEmpty && line.first != "#" else {
+                continue
+            }
             let parts = line.split(separator: " ")
             switch parts.first {
             case "TITLE":
                 title = String(String(parts.dropFirst().joined(separator: " ")).dropFirst().dropLast())
             case "LUT_3D_SIZE":
-                type = .ThreeDimensional
+                type = .threeDimensional
                 guard parts.count == 2, let size = Int(parts[1]) else {
                     throw SwiftCubeError.invalidSize
                 }
                 self.size = size
             case "LUT_1D_SIZE":
-                type = .OneDimensional
                 throw SwiftCubeError.oneDimensionalLutNotSupported
             case "DOMAIN_MIN":
                 throw SwiftCubeError.unsupportedKey
@@ -104,8 +104,8 @@ public struct LUTDomain: Codable {
 }
 
 public enum LUTType: Codable {
-    case OneDimensional
-    case ThreeDimensional
+    case oneDimensional
+    case threeDimensional
 }
 
 public enum SwiftCubeError: Error {
