@@ -10,25 +10,26 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "SwiftCube",
-            targets: ["SwiftCube"]),
+            targets: ["SwiftCube"]
+        ),
     ],
     dependencies: [
-        .package(url: "https://github.com/christophhagen/BinaryCodable", from: "3.0.0")
+        .package(url: "https://github.com/christophhagen/BinaryCodable", from: "3.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "SwiftCube", dependencies: [
-                .product(name: "BinaryCodable", package: "BinaryCodable")
-            ]),
+                .product(name: "BinaryCodable", package: "BinaryCodable"),
+            ]
+        ),
         .testTarget(
             name: "SwiftCubeTests",
             dependencies: ["SwiftCube"], resources: [
                 .process("SampleLUT.cube"),
-               
-                                                       .process("SampleImage.jpg")]
+
+                .process("SampleImage.jpg")]
         ),
     ]
-
 )
