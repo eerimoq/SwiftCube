@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftCube",
-    platforms: [.macOS("10.15"), .iOS("13.0")],
+    platforms: [.macOS("10.15"), .iOS("16.0")],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
@@ -28,7 +28,6 @@ let package = Package(
             name: "SwiftCubeTests",
             dependencies: ["SwiftCube"], resources: [
                 .process("SampleLUT.cube"),
-
                 .process("SampleImage.jpg")]
         ),
     ]

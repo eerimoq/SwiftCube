@@ -4,7 +4,6 @@ import Foundation
 import Testing
 import UIKit
 
-@available(iOS 16.0, *)
 @Test func importAndCreateLUT() async throws {
     let lutURL = Bundle.module.url(forResource: "SampleLUT", withExtension: "cube")!
     let lutData = try Data(contentsOf: lutURL)
@@ -19,7 +18,6 @@ import UIKit
     #expect(result != nil)
 }
 
-@available(iOS 16.0, *)
 @Test func importAndCreateLUTFromURL() async throws {
     let lutURL = Bundle.module.url(forResource: "SampleLUT", withExtension: "cube")!
 

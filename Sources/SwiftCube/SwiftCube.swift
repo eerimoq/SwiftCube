@@ -3,9 +3,15 @@ import CoreImage.CIFilterBuiltins
 import Foundation
 
 public struct LutEntry {
-    let red: Float
-    let green: Float
-    let blue: Float
+    public let red: Float
+    public let green: Float
+    public let blue: Float
+    
+    public init(red: Float, green: Float, blue: Float) {
+        self.red = red
+        self.green = green
+        self.blue = blue
+    }
 }
 
 func parseNumber(_ value: Substring) throws -> Float {
@@ -33,7 +39,7 @@ public struct SC3DLut {
         guard !stringData.isEmpty else {
             throw SwiftCubeError.couldNotDecodeData
         }
-        for line in stringData.components(separatedBy: "\n") {
+        for line in stringData.split(separator: /[\r\n]+/) {
             guard !line.isEmpty, line.first != "#" else {
                 continue
             }
