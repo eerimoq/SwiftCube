@@ -39,7 +39,7 @@ public struct SC3DLut {
         guard !stringData.isEmpty else {
             throw SwiftCubeError.couldNotDecodeData
         }
-        for line in stringData.split(separator: /[\r\n]+/) {
+        for line in stringData.split(separator: /(\r|\n|\r\n)+/) {
             guard !line.isEmpty, line.first != "#" else {
                 continue
             }
