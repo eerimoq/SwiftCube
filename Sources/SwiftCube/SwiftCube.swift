@@ -16,7 +16,7 @@ public struct LutEntry {
 
 func parseNumber(_ value: Substring) throws -> Float {
     guard let number = Float(value) else {
-        throw SwiftCubeError.invalidDataPoint
+        throw SwiftCubeError.invalidSyntax(String(value.prefix(50)))
     }
     return number
 }
@@ -35,8 +35,7 @@ public struct SC3DLut {
 
     /// Initialize a LUT from a .cube file's data
     public init(fileData: Data) throws {
-        let stringData = String(decoding: fileData, as: UTF8.self)
-        guard !stringData.isEmpty else {
+        guard let stringData = String(bytes: fileData, encoding: .utf8) else {
             throw SwiftCubeError.couldNotDecodeData
         }
         for line in stringData.split(separator: /(\r|\n|\r\n)+/) {
@@ -47,32 +46,45 @@ public struct SC3DLut {
             switch parts.first {
             case "TITLE":
                 title = String(String(parts.dropFirst().joined(separator: " ")).dropFirst().dropLast())
+            case "LUT_1D_SIZE":
+                throw SwiftCubeError.oneDimensionalLutNotSupported
             case "LUT_3D_SIZE":
                 type = .threeDimensional
                 guard parts.count == 2, let size = Int(parts[1]) else {
-                    throw SwiftCubeError.invalidSize
+                    throw SwiftCubeError.invalidSyntax(String(line.prefix(50)))
                 }
                 self.size = size
-            case "LUT_1D_SIZE":
-                throw SwiftCubeError.oneDimensionalLutNotSupported
+                guard size < 100 else {
+                    throw SwiftCubeError.sizeTooBig(size)
+                }
             case "DOMAIN_MIN":
-                throw SwiftCubeError.unsupportedKey
+                throw SwiftCubeError.unsupportedKey("DOMAIN_MIN")
             case "DOMAIN_MAX":
-                throw SwiftCubeError.unsupportedKey
+                throw SwiftCubeError.unsupportedKey("DOMAIN_MAX")
             default:
                 guard parts.count == 3 else {
-                    throw SwiftCubeError.invalidDataPoint
+                    throw SwiftCubeError.invalidSyntax(String(line.prefix(50)))
                 }
                 try entries.append(LutEntry(red: parseNumber(parts[0]),
                                             green: parseNumber(parts[1]),
                                             blue: parseNumber(parts[2])))
             }
         }
-        guard size != nil else {
-            throw SwiftCubeError.invalidSize
+        guard let size else {
+            throw SwiftCubeError.sizeMissing
         }
-        guard type != nil else {
-            throw SwiftCubeError.invalidType
+        guard let type else {
+            throw SwiftCubeError.typeMissing
+        }
+        switch type {
+        case .oneDimensional:
+            guard entries.count == size else {
+                throw SwiftCubeError.wrongNumberOfDataPoints(entries.count)
+            }
+        case .threeDimensional:
+            guard entries.count == size * size * size else {
+                throw SwiftCubeError.wrongNumberOfDataPoints(entries.count)
+            }
         }
     }
 
@@ -100,9 +112,13 @@ public enum LutType: Codable {
 
 public enum SwiftCubeError: Error {
     case couldNotDecodeData
-    case invalidSize
+    case sizeMissing
+    case sizeTooBig(Int)
     case oneDimensionalLutNotSupported
-    case unsupportedKey
+    case unsupportedKey(String)
     case invalidType
-    case invalidDataPoint
+    case typeMissing
+    case invalidDataPoint(String)
+    case wrongNumberOfDataPoints(Int)
+    case invalidSyntax(String)
 }
